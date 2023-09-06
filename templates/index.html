@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>챗봇</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        #chat-container {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        .message {
+            margin-bottom: 5px;
+        }
+
+        .user-message {
+            text-align: right;
+            font-weight: bold;
+            color: #337ab7;
+        }
+
+        .bot-message {
+            text-align: left;
+            font-weight: bold;
+            color: #555;
+        }
+
+        #score-container {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        #score-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        #score-value {
+            font-weight: bold;
+            color: #337ab7;
+        }
+
+        form {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            width: 400px;
+            height: 40px;
+            font-size: 16px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #337ab7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #warning-message {
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>챗봇</h1>
+
+    <div id="score-container">
+        <span id="score-label">스코어:</span>
+        <span id="score-value">{{ score }}</span>
+    </div>
+
+    <div id="chat-container">
+        {% for chat in chat_history %}
+            <div class="message">
+                {% if score <= -10 %}
+                    <div id="warning-message">
+                        경고: 스코어가 -10점 이하입니다!
+                    </div>
+                {% endif %}
+                {% if chat.user_input %}
+                    <p class="user-message">나: {{ chat.user_input }}</p>
+                {% endif %}
+                {% if chat.translated_input %}
+                    <p class="user-message">번역: {{ chat.translated_input }}</p>
+                {% endif %}
+                {% if chat.bot_response %}
+                    <p class="bot-message">챗봇: {{ chat.bot_response }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <form action="/chat" method="POST">
+        <input type="text" name="user_input" placeholder="문장을 입력하세요">
+        <br>
+        <input type="submit" value="전송">
+    </form>
+
+    <script>
+        function scrollChatContainer() {
+            var chatContainer = document.getElementById("chat-container");
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        window.onload = function() {
+            scrollChatContainer();
+            showScore();
+            showWarningMessage();
+
+        };
+
+        function showScore() {
+            var scoreValue = "{{ score }}";
+            var scoreElement = document.getElementById("score-value");
+            scoreElement.innerHTML = scoreValue;
+        }
+        function showWarningMessage() {
+            var scoreValue = "{{ score }}";
+            var warningMessageElement = document.getElementById("warning-message");
+
+            if (scoreValue <= -10) {
+                warningMessageElement.style.display = "block";
+            } else {
+                warningMessageElement.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
